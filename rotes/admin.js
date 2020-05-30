@@ -3,14 +3,15 @@ const router = express.Router()
 const mongoose = require("mongoose")
 require("../models/Categoria")
 const Categoria = mongoose.model("categorias")
+const login = require("../middleware/login")
 
 
 
-router.get('/',(req,res) =>{
+router.get('/',login,(req,res) =>{
     res.render("admin/index")
 })
 
-router.post('/categorias/nova',(req,res) =>{
+router.post('/categorias/nova',login,(req,res) =>{
 
     var erros = []
     if(!req.body.nome || typeof req.body.nome == undefined || req.body.nome == null){
@@ -38,14 +39,14 @@ router.post('/categorias/nova',(req,res) =>{
     }
 })
 
-router.get('/categorias/busca/:id',(req,res) =>{
+router.get('/categorias/busca/:id',login,(req,res) =>{
     Categoria.find({_id:req.params.id}).lean().then((categorias) => {
         res.send({categorias:categorias})
     }).catch((err) => {
         res.send(err)
     })
 })
-router.post('/categorias/edit',(req,res) =>{
+router.post('/categorias/edit',login,(req,res) =>{
 
     Categoria.findById(req.body.id).then((categorias) => {
         categorias.nome = req.body.nome
@@ -61,7 +62,7 @@ router.post('/categorias/edit',(req,res) =>{
     })
 })
 
-router.post('/categorias/delete',(req,res) =>{
+router.post('/categorias/delete',login,(req,res) =>{
 
     Categoria.findById(req.body.id).then((categorias) => {
         categorias.remove().then(() => {
@@ -75,7 +76,7 @@ router.post('/categorias/delete',(req,res) =>{
     })
 })
 
-router.get('/categorias',(req,res) =>{
+router.get('/categorias',login,(req,res) =>{
     Categoria.find().lean().then((categorias) => {
         res.send({categorias:categorias})
     }).catch((err) => {
