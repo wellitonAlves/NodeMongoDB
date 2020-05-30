@@ -2,6 +2,7 @@ const express = require('express')
 const handlebars = require('express-handlebars')
 const bodyParser = require('body-parser')
 const admin = require("./rotes/admin")
+const usuario = require("./rotes/usuario")
 const path = require("path")
 const session = require("express-session")
 const flash = require("connect-flash")
@@ -46,6 +47,7 @@ mongoose.connect("mongodb://localhost/estudos",{
 
 //rotas
 app.use("/admin", admin)
+app.use("/usuario", usuario)
 
 
 
