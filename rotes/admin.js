@@ -11,26 +11,76 @@ router.get('/',(req,res) =>{
 })
 
 router.post('/categorias/nova',(req,res) =>{
-    const novaCategoria = {
-        nome: req.body.nome,
-        slug: req.body.slug
+
+    var erros = []
+    if(!req.body.nome || typeof req.body.nome == undefined || req.body.nome == null){
+        erros.push({texto:"nome inválido"})
+    }
+    if(!req.body.slug || typeof req.body.slug == undefined || req.body.slug == null){
+        erros.push({texto:"slug inválido"})
     }
 
-    new Categoria(novaCategoria).save().then(()=>{
-        console.log("Categoria salva com sucesso")
-        res.send("categoria salvo com sucesso")
-    }).catch((err)=>{
-        console.log("Erro ao salvar categoria"+err)
-        res.send("Erro ao salvar categoria:"+req)
+    if(erros.length > 0){
+        res.render(erros)
+    }else{
+
+        const novaCategoria = {
+            nome: req.body.nome,
+            slug: req.body.slug
+        }
+
+        new Categoria(novaCategoria).save().then(()=>{
+            console.log("Categoria salva com sucesso")
+            res.send("categoria salvo com sucesso")
+        }).catch((err)=>{
+            console.log("Erro ao salvar categoria"+err)
+        })
+    }
+})
+
+router.get('/categorias/busca/:id',(req,res) =>{
+    Categoria.find({_id:req.params.id}).lean().then((categorias) => {
+        res.send({categorias:categorias})
+    }).catch((err) => {
+        res.send(err)
+    })
+})
+router.post('/categorias/edit',(req,res) =>{
+
+    Categoria.findById(req.body.id).then((categorias) => {
+        categorias.nome = req.body.nome
+        categorias.slug = req.body.slug
+
+        categorias.save().then(() => {
+            res.send("categoria atualizada com sucesso")
+        }).catch((err) => {
+            res.send(err)
+        })
+    }).catch((err) => {
+        res.send(err)
     })
 })
 
-router.get('/posts',(req,res) =>{
-    res.send("Página de posts")
+router.post('/categorias/delete',(req,res) =>{
+
+    Categoria.findById(req.body.id).then((categorias) => {
+        categorias.remove().then(() => {
+            res.send("categoria deletada com sucesso")
+        }).catch((err) => {
+            console.log("erro"+err)
+            res.send(err)
+        })
+    }).catch((err) => {
+        res.send(err)
+    })
 })
 
 router.get('/categorias',(req,res) =>{
-    res.send("Página de categorias")
+    Categoria.find().lean().then((categorias) => {
+        res.send({categorias:categorias})
+    }).catch((err) => {
+        res.send(err)
+    })
 })
 
 module.exports = router
